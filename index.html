@@ -426,12 +426,16 @@ let selectedRoundIndex = 0;
     // On-Course Competitions running totals
     const awardGrid = 'grid-template-columns: 1fr 60px 60px 60px 60px;';
     const allPlayers = allSeasonData['2026'].players;
-    const awardRows = allPlayers
-      .map(p => ({
-        name:    p.name,
-        ldWins:  allRounds.filter(r => r.ld  === p.name).length,
-        npWins:  allRounds.filter(r => r.np  === p.name).length,
-        np2Wins: allRounds.filter(r => r.np2 === p.name).length,
+    const awardNames = new Set(allPlayers.map(p => p.name));
+    allRounds.forEach(r => {
+      [r.ld, r.np, r.np2].forEach(w => { if (w) awardNames.add(w); });
+    });
+    const awardRows = Array.from(awardNames)
+      .map(name => ({
+        name,
+        ldWins:  allRounds.filter(r => r.ld  === name).length,
+        npWins:  allRounds.filter(r => r.np  === name).length,
+        np2Wins: allRounds.filter(r => r.np2 === name).length,
       }))
       .filter(p => p.ldWins + p.npWins + p.np2Wins > 0)
       .sort((a, b) => (b.ldWins + b.npWins + b.np2Wins) - (a.ldWins + a.npWins + a.np2Wins))
